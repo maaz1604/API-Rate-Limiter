@@ -23,7 +23,7 @@ This project implements a robust **API Rate Limiting System** that restricts API
 | ----------- | ------------------------- |
 | Backend     | Node.js, Express.js       |
 | Database    | MongoDB (Mongoose ODM)    |
-| Email       | Nodemailer + Gmail SMTP   |
+| Email       | Nodemailer + Gmail OAuth2 |
 | Scheduler   | node-cron                 |
 | Data Format | json2csv (CSV generation) |
 | Security    | Hashed API Keys (SHA-256) |
@@ -87,7 +87,9 @@ Create a `.env` file:
 PORT=3000
 MONGO_URI=mongodb+srv://your-db-uri
 EMAIL_USER=youremail@gmail.com
-EMAIL_PASS=yourapppassword
+CLIENT_ID=your-google-oauth-client-id
+CLIENT_SECRET=your-google-oauth-client-secret
+REFRESH_TOKEN=your-google-oauth-refresh-token
 ADMIN_EMAIL=admin@example.com
 ```
 

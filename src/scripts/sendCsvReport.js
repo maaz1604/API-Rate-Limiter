@@ -4,10 +4,10 @@ dotenv.config();
 
 import { User } from "../models/user.model.js";
 import { Usage } from "../models/usage.model.js";
-import nodemailer from "nodemailer";
 import { Parser } from "json2csv";
 import fs from "fs";
 import path from "path";
+import { transporter } from "../utils/email.js";
 
 const sendDailyCSV = async () => {
     const date = new Date().toISOString().slice(0, 10);
@@ -35,15 +35,6 @@ const sendDailyCSV = async () => {
     // Ensure reports folder exists
     fs.mkdirSync("reports", { recursive: true });
     fs.writeFileSync(filePath, csv);
-
-    // Email setup
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
 
     const info = await transporter.sendMail({
         from: `"API System" <${process.env.EMAIL_USER}>`,
