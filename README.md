@@ -129,11 +129,76 @@ JWT_EXPIRES_IN=7d
 - 🧪 API testing dashboard (Postman clone UI).
 
 - 📁 Download logs & reports from dashboard.
+# API Rate Limiter
 
-## Scripts
+Lightweight API rate-limiting service with per-user API keys, daily usage tracking, email alerts, and an admin dashboard.
 
-`npm run dev` – Start dev server (with nodemon)
+What it provides
+- API key generation (hashed, shown once)
+- Daily request counting and plan-based limits (`basic`, `pro`, `premium`)
+- Email warnings at 90% and block at 100% (Gmail OAuth2 via Nodemailer)
+- JWT-based user authentication and role-based (admin) access
+- Daily CSV usage report emailed to admin
 
-`node index.js` – Run usage reset cron
+Tech stack
+- Node.js + Express
+- MongoDB (Mongoose)
+- Nodemailer (Gmail OAuth2)
+- JWT (`jsonwebtoken`) and password hashing (`bcryptjs`)
 
-`node scripts/dailyReport.js` – Send daily CSV
+Quick start
+1. Create a `.env` file 
+
+```ini
+PORT=3000
+MONGO_URI=mongodb+srv://<your-cluster>/<db>
+EMAIL_USER=youremail@gmail.com
+CLIENT_ID=<google-oauth-client-id>
+CLIENT_SECRET=<google-oauth-client-secret>
+REFRESH_TOKEN=<google-oauth-refresh-token>
+ADMIN_EMAIL=admin@example.com
+JWT_SECRET=<long-random-secret>
+JWT_EXPIRES_IN=7d
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Run in development:
+
+```bash
+npm run dev
+```
+
+Useful scripts
+- `npm run dev` — start server with `nodemon`.
+- `node index.js` — run scheduled tasks (resets + report cron).
+- `node src/scripts/sendCsvReport.js` — send daily CSV manually.
+
+API overview
+- `POST /api/users` — create user (returns raw API key and JWT). Body: `{ name, email, password, plan }`.
+- `POST /api/auth/login` — login, returns JWT. Body: `{ email, password }`.
+- `GET /api/data` — protected by API key header `x-api-key`. Rate-limited.
+- `GET /api/admin/dashboard` — admin-only, requires `Authorization: Bearer <token>`.
+- `PUT /api/admin/users/:id/apikey` — regenerate user's API key (admin only).
+
+Auth and roles
+- New users whose email equals `ADMIN_EMAIL` in `.env` are created with `admin` role.
+- Use returned JWT as `Authorization: Bearer <token>` for protected endpoints.
+- API key auth (header `x-api-key`) remains in place for the main data route; JWT is used for user management and admin endpoints.
+
+Email
+- The project uses Gmail OAuth2. Provide `CLIENT_ID`, `CLIENT_SECRET`, `REFRESH_TOKEN`, and `EMAIL_USER`.
+- See `src/utils/email.js` for transporter configuration.
+
+Database
+- Mongoose models live in `src/models` (`User`, `Usage`, `Subscription`).
+
+Testing admin access (Postman)
+1. Register an admin (email matching `ADMIN_EMAIL`) or promote a user in the DB.
+2. Login: `POST /api/auth/login` → copy `token`.
+3. Call: `GET /api/admin/dashboard` with header `Authorization: Bearer <token>`.
+
