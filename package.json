@@ -1,0 +1,26 @@
+{
+  "name": "api-rate-limiter",
+  "version": "1.0.0",
+  "description": "I built an API usage tracking system that assigns API keys to users and limits requests based on plan — with logs and automated warnings",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "cron": "nodemon index.js",
+    "all": "concurrently \"npm run dev\" \"npm run cron\""
+  },
+  "author": "Maaz Amir",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "mongoose": "^8.16.3",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "nodemon": "^3.1.10"
+  }
+}
