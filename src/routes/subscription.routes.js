@@ -2,13 +2,18 @@
 import express from "express";
 import { Subscription } from "../models/subscription.model.js";
 import { User } from "../models/user.model.js";
+import { authenticateToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // Create subscription and update user
-router.post("/subscriptions", async (req, res) => {
+router.post("/subscriptions", authenticateToken, async (req, res) => {
     try {
         const { userId, plan } = req.body;
+
+        if (req.auth.role !== "admin" && req.auth.userId !== userId) {
+            return res.status(403).json({ success: false, message: "You can only manage your own subscription" });
+        }
 
         const subscription = await Subscription.create({
             userId,

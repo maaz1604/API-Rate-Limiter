@@ -7,6 +7,8 @@ This project implements a robust **API Rate Limiting System** that restricts API
 ## 📌 Key Features
 
 - 🔐 **API Key Generation** for each user.
+- 🔑 **JWT Authentication** with login/register endpoints.
+- 👮 **Role-based access** for admin-only routes.
 - 📊 **Daily API Usage Tracking** per user via MongoDB.
 - ⚠️ **Automatic Email Warning** at 90% usage.
 - ⛔ **Limit Reached Email** and block at 100% usage.
@@ -24,6 +26,7 @@ This project implements a robust **API Rate Limiting System** that restricts API
 | Backend     | Node.js, Express.js       |
 | Database    | MongoDB (Mongoose ODM)    |
 | Email       | Nodemailer + Gmail OAuth2 |
+| Auth        | JSON Web Token (JWT)       |
 | Scheduler   | node-cron                 |
 | Data Format | json2csv (CSV generation) |
 | Security    | Hashed API Keys (SHA-256) |
@@ -40,9 +43,25 @@ This project implements a robust **API Rate Limiting System** that restricts API
 {
   "name": "Maaz",
   "email": "maaz@example.com",
+  "password": "your-password",
   "plan": "basic"
 }
 ```
+
+This endpoint returns both the API key and a JWT token. The user whose email matches `ADMIN_EMAIL` in `.env` is created with the `admin` role.
+
+### 1b. Login
+
+`POST /api/auth/login`
+
+```json
+{
+  "email": "maaz@example.com",
+  "password": "your-password"
+}
+```
+
+Use the returned JWT as `Authorization: Bearer <token>` for protected routes.
 
 ### 2. Regenerate API Key (Admin)
 
@@ -62,6 +81,8 @@ x-api-key: YOUR_API_KEY_HERE
 
 `GET /api/admin/dashboard` <br>
 📊 Returns all users with today’s usage.
+
+Requires `Authorization: Bearer <token>` with the `admin` role.
 
 ### 5. Update User Details
 
@@ -91,6 +112,8 @@ CLIENT_ID=your-google-oauth-client-id
 CLIENT_SECRET=your-google-oauth-client-secret
 REFRESH_TOKEN=your-google-oauth-refresh-token
 ADMIN_EMAIL=admin@example.com
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_EXPIRES_IN=7d
 ```
 
 ---
@@ -98,8 +121,6 @@ ADMIN_EMAIL=admin@example.com
 ### Future Implementations
 
 - 🔒 JWT-based authentication + role-based access.
-
-- 💰 Stripe integration for upgrading plans.
 
 - 📈 Analytics dashboard with charts (React/Next.js).
 

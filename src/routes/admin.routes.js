@@ -3,8 +3,11 @@ import { User } from "../models/user.model.js";
 import { Usage } from "../models/usage.model.js";
 import { randomUUID, createHash } from "crypto";
 import { Parser } from "json2csv";
+import { authenticateToken, authorizeRoles } from "../middleware/auth.js";
 
 const router = express.Router();
+
+router.use(authenticateToken, authorizeRoles("admin"));
 
 // Utility: Hash API key
 function hashKey(key) {
